@@ -35,7 +35,7 @@ func (m *SumRequest) Reset()         { *m = SumRequest{} }
 func (m *SumRequest) String() string { return proto.CompactTextString(m) }
 func (*SumRequest) ProtoMessage()    {}
 func (*SumRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_calculator_eba9ee92794638c0, []int{0}
+	return fileDescriptor_calculator_a071d2318df5dfa9, []int{0}
 }
 func (m *SumRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SumRequest.Unmarshal(m, b)
@@ -80,7 +80,7 @@ func (m *ResultResponse) Reset()         { *m = ResultResponse{} }
 func (m *ResultResponse) String() string { return proto.CompactTextString(m) }
 func (*ResultResponse) ProtoMessage()    {}
 func (*ResultResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_calculator_eba9ee92794638c0, []int{1}
+	return fileDescriptor_calculator_a071d2318df5dfa9, []int{1}
 }
 func (m *ResultResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ResultResponse.Unmarshal(m, b)
@@ -107,9 +107,87 @@ func (m *ResultResponse) GetNumber() int64 {
 	return 0
 }
 
+type PrimeNumberRequest struct {
+	Number               int64    `protobuf:"varint,1,opt,name=number,proto3" json:"number,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *PrimeNumberRequest) Reset()         { *m = PrimeNumberRequest{} }
+func (m *PrimeNumberRequest) String() string { return proto.CompactTextString(m) }
+func (*PrimeNumberRequest) ProtoMessage()    {}
+func (*PrimeNumberRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_calculator_a071d2318df5dfa9, []int{2}
+}
+func (m *PrimeNumberRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PrimeNumberRequest.Unmarshal(m, b)
+}
+func (m *PrimeNumberRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PrimeNumberRequest.Marshal(b, m, deterministic)
+}
+func (dst *PrimeNumberRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PrimeNumberRequest.Merge(dst, src)
+}
+func (m *PrimeNumberRequest) XXX_Size() int {
+	return xxx_messageInfo_PrimeNumberRequest.Size(m)
+}
+func (m *PrimeNumberRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_PrimeNumberRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PrimeNumberRequest proto.InternalMessageInfo
+
+func (m *PrimeNumberRequest) GetNumber() int64 {
+	if m != nil {
+		return m.Number
+	}
+	return 0
+}
+
+type PrimeNumberResponse struct {
+	Number               int64    `protobuf:"varint,1,opt,name=number,proto3" json:"number,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *PrimeNumberResponse) Reset()         { *m = PrimeNumberResponse{} }
+func (m *PrimeNumberResponse) String() string { return proto.CompactTextString(m) }
+func (*PrimeNumberResponse) ProtoMessage()    {}
+func (*PrimeNumberResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_calculator_a071d2318df5dfa9, []int{3}
+}
+func (m *PrimeNumberResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PrimeNumberResponse.Unmarshal(m, b)
+}
+func (m *PrimeNumberResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PrimeNumberResponse.Marshal(b, m, deterministic)
+}
+func (dst *PrimeNumberResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PrimeNumberResponse.Merge(dst, src)
+}
+func (m *PrimeNumberResponse) XXX_Size() int {
+	return xxx_messageInfo_PrimeNumberResponse.Size(m)
+}
+func (m *PrimeNumberResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_PrimeNumberResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PrimeNumberResponse proto.InternalMessageInfo
+
+func (m *PrimeNumberResponse) GetNumber() int64 {
+	if m != nil {
+		return m.Number
+	}
+	return 0
+}
+
 func init() {
 	proto.RegisterType((*SumRequest)(nil), "calculator.SumRequest")
 	proto.RegisterType((*ResultResponse)(nil), "calculator.ResultResponse")
+	proto.RegisterType((*PrimeNumberRequest)(nil), "calculator.PrimeNumberRequest")
+	proto.RegisterType((*PrimeNumberResponse)(nil), "calculator.PrimeNumberResponse")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -126,6 +204,7 @@ const _ = grpc.SupportPackageIsVersion4
 type CalculatorServiceClient interface {
 	// Unary
 	Sum(ctx context.Context, in *SumRequest, opts ...grpc.CallOption) (*ResultResponse, error)
+	PrimeNumber(ctx context.Context, in *PrimeNumberRequest, opts ...grpc.CallOption) (CalculatorService_PrimeNumberClient, error)
 }
 
 type calculatorServiceClient struct {
@@ -145,10 +224,43 @@ func (c *calculatorServiceClient) Sum(ctx context.Context, in *SumRequest, opts 
 	return out, nil
 }
 
+func (c *calculatorServiceClient) PrimeNumber(ctx context.Context, in *PrimeNumberRequest, opts ...grpc.CallOption) (CalculatorService_PrimeNumberClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_CalculatorService_serviceDesc.Streams[0], "/calculator.CalculatorService/PrimeNumber", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &calculatorServicePrimeNumberClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type CalculatorService_PrimeNumberClient interface {
+	Recv() (*PrimeNumberResponse, error)
+	grpc.ClientStream
+}
+
+type calculatorServicePrimeNumberClient struct {
+	grpc.ClientStream
+}
+
+func (x *calculatorServicePrimeNumberClient) Recv() (*PrimeNumberResponse, error) {
+	m := new(PrimeNumberResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // CalculatorServiceServer is the server API for CalculatorService service.
 type CalculatorServiceServer interface {
 	// Unary
 	Sum(context.Context, *SumRequest) (*ResultResponse, error)
+	PrimeNumber(*PrimeNumberRequest, CalculatorService_PrimeNumberServer) error
 }
 
 func RegisterCalculatorServiceServer(s *grpc.Server, srv CalculatorServiceServer) {
@@ -173,6 +285,27 @@ func _CalculatorService_Sum_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CalculatorService_PrimeNumber_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(PrimeNumberRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(CalculatorServiceServer).PrimeNumber(m, &calculatorServicePrimeNumberServer{stream})
+}
+
+type CalculatorService_PrimeNumberServer interface {
+	Send(*PrimeNumberResponse) error
+	grpc.ServerStream
+}
+
+type calculatorServicePrimeNumberServer struct {
+	grpc.ServerStream
+}
+
+func (x *calculatorServicePrimeNumberServer) Send(m *PrimeNumberResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 var _CalculatorService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "calculator.CalculatorService",
 	HandlerType: (*CalculatorServiceServer)(nil),
@@ -182,23 +315,32 @@ var _CalculatorService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _CalculatorService_Sum_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "PrimeNumber",
+			Handler:       _CalculatorService_PrimeNumber_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "pb/calculator.proto",
 }
 
-func init() { proto.RegisterFile("pb/calculator.proto", fileDescriptor_calculator_eba9ee92794638c0) }
+func init() { proto.RegisterFile("pb/calculator.proto", fileDescriptor_calculator_a071d2318df5dfa9) }
 
-var fileDescriptor_calculator_eba9ee92794638c0 = []byte{
-	// 167 bytes of a gzipped FileDescriptorProto
+var fileDescriptor_calculator_a071d2318df5dfa9 = []byte{
+	// 213 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x2e, 0x48, 0xd2, 0x4f,
 	0x4e, 0xcc, 0x49, 0x2e, 0xcd, 0x49, 0x2c, 0xc9, 0x2f, 0xd2, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17,
 	0xe2, 0x42, 0x88, 0x28, 0x39, 0x70, 0x71, 0x05, 0x97, 0xe6, 0x06, 0xa5, 0x16, 0x96, 0xa6, 0x16,
 	0x97, 0x08, 0x49, 0x70, 0xb1, 0xe7, 0x95, 0xe6, 0x26, 0xa5, 0x16, 0x19, 0x4a, 0x30, 0x2a, 0x30,
 	0x6a, 0x30, 0x07, 0xc1, 0xb8, 0x08, 0x19, 0x23, 0x09, 0x26, 0x64, 0x19, 0x23, 0x25, 0x0d, 0x2e,
 	0xbe, 0xa0, 0xd4, 0xe2, 0xd2, 0x9c, 0x92, 0xa0, 0xd4, 0xe2, 0x82, 0xfc, 0xbc, 0xe2, 0x54, 0x21,
-	0x31, 0x2e, 0x36, 0x88, 0x24, 0xd4, 0x10, 0x28, 0xcf, 0x28, 0x80, 0x4b, 0xd0, 0x19, 0x6e, 0x73,
-	0x70, 0x6a, 0x51, 0x59, 0x66, 0x72, 0xaa, 0x90, 0x35, 0x17, 0x73, 0x70, 0x69, 0xae, 0x90, 0x98,
-	0x1e, 0x92, 0x33, 0x11, 0x2e, 0x92, 0x92, 0x42, 0x16, 0x47, 0xb5, 0x47, 0x89, 0xc1, 0x89, 0x25,
-	0x8a, 0xa9, 0x20, 0x29, 0x89, 0x0d, 0xec, 0x2d, 0x63, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff, 0x64,
-	0x2d, 0xfd, 0x05, 0xed, 0x00, 0x00, 0x00,
+	0x31, 0x2e, 0x36, 0x88, 0x24, 0xd4, 0x10, 0x28, 0x4f, 0x49, 0x87, 0x4b, 0x28, 0xa0, 0x28, 0x33,
+	0x37, 0xd5, 0x0f, 0xcc, 0x85, 0xd9, 0x89, 0x4b, 0xb5, 0x2e, 0x97, 0x30, 0x8a, 0x6a, 0xfc, 0x86,
+	0x1b, 0x2d, 0x61, 0xe4, 0x12, 0x74, 0x86, 0xfb, 0x2b, 0x38, 0xb5, 0xa8, 0x2c, 0x33, 0x39, 0x55,
+	0xc8, 0x9a, 0x8b, 0x39, 0xb8, 0x34, 0x57, 0x48, 0x4c, 0x0f, 0x29, 0x10, 0x10, 0xfe, 0x95, 0x92,
+	0x42, 0x16, 0x47, 0xf5, 0x85, 0x12, 0x83, 0x50, 0x10, 0x17, 0x37, 0x92, 0x0b, 0x84, 0xe4, 0x90,
+	0x15, 0x63, 0x7a, 0x44, 0x4a, 0x1e, 0xa7, 0x3c, 0xcc, 0x44, 0x03, 0x46, 0x27, 0x96, 0x28, 0xa6,
+	0x82, 0xa4, 0x24, 0x36, 0x70, 0x44, 0x18, 0x03, 0x02, 0x00, 0x00, 0xff, 0xff, 0xce, 0x54, 0xb2,
+	0xcd, 0x9f, 0x01, 0x00, 0x00,
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"grpc-smaarek/calculator/pb"
+	"io"
 	"log"
 
 	"google.golang.org/grpc"
@@ -20,7 +21,9 @@ func main() {
 
 	client := pb.NewCalculatorServiceClient(conn)
 
-	doUnary(client)
+	//doUnary(client)
+	doServerStreaming(client)
+
 }
 
 func doUnary(c pb.CalculatorServiceClient) {
@@ -37,4 +40,27 @@ func doUnary(c pb.CalculatorServiceClient) {
 		log.Fatalf("Error while calling Sum RPC: %v", err)
 	}
 	log.Printf("Response from Sum: %v", res.Number)
+}
+
+func doServerStreaming(c pb.CalculatorServiceClient) {
+	fmt.Println("Starting to do a Server Streaming RPC....")
+
+	req := &pb.PrimeNumberRequest{
+		Number: 120,
+	}
+	resStream, err := c.PrimeNumber(context.Background(), req)
+	if err != nil {
+		log.Fatalf("Error while calling PrimeNumber RPC %v", err)
+	}
+
+	for {
+		msg, err := resStream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatalf("Error while reading stream: %v", err)
+		}
+		log.Printf("Response from PrimeNumber: %d", msg.GetNumber())
+	}
 }

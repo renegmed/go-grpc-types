@@ -11,7 +11,17 @@ message SumRequest {
 message ResultResponse {
     int64 number = 1;
 }
+
+message PrimeNumberRequest {
+    int64 number = 1;
+}
+message PrimeNumberResponse {
+    int64 number = 1;
+}
+
 service CalculatorService {
     // Unary
     rpc Sum(SumRequest) returns (ResultResponse) {};
+
+    rpc PrimeNumber(PrimeNumberRequest) returns (stream PrimeNumberResponse) {}; 
 }

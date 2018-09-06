@@ -42,7 +42,7 @@ func (*server) GreetManyTimes(req *greetpb.GreetManyTimesRequest, stream greetpb
 }
 
 func (*server) LongGreet(stream greetpb.GreetService_LongGreetServer) error {
-	fmt.Printf("LongGreet function was invoked with a stream request")
+	fmt.Printf("LongGreet function was invoked with a stream request\n")
 	result := ""
 	for {
 		req, err := stream.Recv()
@@ -57,7 +57,7 @@ func (*server) LongGreet(stream greetpb.GreetService_LongGreetServer) error {
 		}
 
 		firstName := req.GetGreeting().GetFirstName()
-		result += "Hello " + firstName + "!"
+		result += "Hello " + firstName + "! "
 	}
 }
 

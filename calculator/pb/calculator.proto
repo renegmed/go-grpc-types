@@ -19,9 +19,22 @@ message PrimeNumberResponse {
     int64 number = 1;
 }
 
+message NumberRequest {
+    float number = 1;
+}
+
+message ComputedAverageResponse {
+    float average = 1;
+}
+
 service CalculatorService {
     // Unary
     rpc Sum(SumRequest) returns (ResultResponse) {};
 
-    rpc PrimeNumber(PrimeNumberRequest) returns (stream PrimeNumberResponse) {}; 
+    // Server Streaming    
+    rpc PrimeNumber(PrimeNumberRequest) returns (stream PrimeNumberResponse) {};
+    
+    // Client Streaming
+    rpc Average(stream NumberRequest) returns (ComputedAverageResponse) {};
+
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"grpc-smaarek/calculator/pb"
+	"io"
 	"log"
 	"net"
 
@@ -39,6 +40,42 @@ func (*server) PrimeNumber(req *pb.PrimeNumberRequest, stream pb.CalculatorServi
 		}
 	}
 	return nil
+}
+
+func (*server) Average(stream pb.CalculatorService_AverageServer) error {
+	fmt.Printf("Average function was invoked with a stream request\n")
+	var counter int
+	//var inputs []float32 // declare a slice to contain received inputs
+	var accumulator float32
+	for {
+		req, err := stream.Recv()
+		// if err == io.EOF {
+		// 	// finished reading the client stream
+		// 	var accum float32
+		// 	for _, val := range inputs {
+		// 		accum += val
+		// 	}
+		// 	average = accum / (float32)(len(inputs))
+
+		// 	return stream.SendAndClose(&pb.ComputedAverageResponse{
+		// 		Average: average,
+		// 	})
+		// }
+		if err == io.EOF {
+			return stream.SendAndClose(&pb.ComputedAverageResponse{
+				Average: accumulator / (float32)(counter),
+			})
+		}
+		if err != nil {
+			log.Fatalf("Error while reading client stream: %v", err)
+		}
+
+		//append(inputs, req.GetNumber())
+
+		accumulator += req.GetNumber()
+		counter++
+
+	}
 }
 
 func main() {

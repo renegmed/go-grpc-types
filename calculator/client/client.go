@@ -6,6 +6,7 @@ import (
 	"grpc-smaarek/calculator/pb"
 	"io"
 	"log"
+	"time"
 
 	"google.golang.org/grpc"
 )
@@ -22,8 +23,45 @@ func main() {
 	client := pb.NewCalculatorServiceClient(conn)
 
 	//doUnary(client)
-	doServerStreaming(client)
+	//doServerStreaming(client)
 
+	doClientStreaming(client)
+
+}
+
+func doClientStreaming(c pb.CalculatorServiceClient) {
+	fmt.Println("Starting to do a Client Streaming RPC....")
+	requests := []*pb.NumberRequest{
+		&pb.NumberRequest{
+			Number: 1,
+		},
+		&pb.NumberRequest{
+			Number: 2,
+		},
+		&pb.NumberRequest{
+			Number: 3,
+		},
+		&pb.NumberRequest{
+			Number: 4,
+		},
+	}
+	stream, err := c.Average(context.Background())
+	if err != nil {
+		log.Fatalf("Error while calling Average: %v", err)
+	}
+	// iterate slice and send each message individually
+	for _, req := range requests {
+		fmt.Printf("Sending req: %v\n", req)
+		stream.Send(req)
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	res, err := stream.CloseAndRecv()
+	if err != nil {
+		log.Fatalf("Error while receiving response from Average: %v", err)
+	}
+
+	fmt.Printf("Computed Average Response: %v\n", res)
 }
 
 func doUnary(c pb.CalculatorServiceClient) {

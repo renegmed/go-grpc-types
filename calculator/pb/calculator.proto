@@ -27,6 +27,14 @@ message ComputedAverageResponse {
     float average = 1;
 }
 
+message MaximumNumberRequest {
+    int64 number = 1;
+}
+
+message MaximumNumberResponse {
+    int64 number = 1;
+}
+
 service CalculatorService {
     // Unary
     rpc Sum(SumRequest) returns (ResultResponse) {};
@@ -36,5 +44,8 @@ service CalculatorService {
     
     // Client Streaming
     rpc Average(stream NumberRequest) returns (ComputedAverageResponse) {};
+
+    // BiDi Streaming
+    rpc MaximumNumber(stream MaximumNumberRequest) returns (stream MaximumNumberResponse) {};
 
 }

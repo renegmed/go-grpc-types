@@ -25,8 +25,9 @@ func main() {
 	//doUnary(client)
 	//doServerStreaming(client)
 
-	doClientStreaming(client)
+	// doClientStreaming(client)
 
+	doBiDiStreaming(client)
 }
 
 func doClientStreaming(c pb.CalculatorServiceClient) {
@@ -101,4 +102,71 @@ func doServerStreaming(c pb.CalculatorServiceClient) {
 		}
 		log.Printf("Response from PrimeNumber: %d", msg.GetNumber())
 	}
+}
+
+func doBiDiStreaming(c pb.CalculatorServiceClient) {
+	fmt.Println("Starting to do a Bi-Directional Streaming RPC....")
+	requests := []*pb.MaximumNumberRequest{
+		&pb.MaximumNumberRequest{
+			Number: 1,
+		},
+		&pb.MaximumNumberRequest{
+			Number: 5,
+		},
+		&pb.MaximumNumberRequest{
+			Number: 3,
+		},
+		&pb.MaximumNumberRequest{
+			Number: 6,
+		},
+		&pb.MaximumNumberRequest{
+			Number: 2,
+		},
+		&pb.MaximumNumberRequest{
+			Number: 20,
+		},
+		&pb.MaximumNumberRequest{
+			Number: 15,
+		},
+		&pb.MaximumNumberRequest{
+			Number: 8,
+		},
+	}
+
+	// create a stream by invoking the client
+	stream, err := c.MaximumNumber(context.Background())
+	if err != nil {
+		log.Fatalf("Error while creating stream: %v", err)
+	}
+
+	waitc := make(chan struct{})
+
+	// send a bunch of messages to the client (go routine)
+	go func() {
+		// function to send a bunch of messages
+		for _, req := range requests {
+			fmt.Printf("Sending message: %v\n", req)
+			stream.Send(req)
+			time.Sleep(1000 * time.Microsecond)
+		}
+		stream.CloseSend()
+	}()
+	// receive a bunch of messages from the server (go routine)
+	go func() {
+		// function to receive a bunch of messages
+		for {
+			res, err := stream.Recv()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				log.Fatalf("Error while receiving: %v", err)
+				break
+			}
+			fmt.Printf("Received Maximum Number: %v\n", res.GetNumber())
+		}
+		close(waitc)
+	}()
+	// block until everything is done
+	<-waitc
 }

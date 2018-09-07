@@ -78,6 +78,34 @@ func (*server) Average(stream pb.CalculatorService_AverageServer) error {
 	}
 }
 
+func (*server) MaximumNumber(stream pb.CalculatorService_MaximumNumberServer) error {
+	fmt.Printf("MaximumNumber function was invoked with a stream request\n")
+
+	var maxNumber int64
+
+	for {
+		req, err := stream.Recv()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			log.Fatalf("Error while reading client stream: %v", err)
+			return err
+		}
+		inputNumber := req.GetNumber()
+		if inputNumber > maxNumber {
+			maxNumber = inputNumber
+		}
+		sendErr := stream.Send(&pb.MaximumNumberResponse{
+			Number: maxNumber,
+		})
+		if sendErr != nil {
+			log.Fatalf("Error while sending data to client: %v", sendErr)
+			return sendErr
+		}
+	}
+}
+
 func main() {
 	fmt.Println("Hello Server")
 

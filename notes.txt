@@ -1,0 +1,38 @@
+
+What's a Client Streaming API?
+
+Client Streaming API are a new kind API enabled thanks to HTTP/2
+
+The client will send many message to the server and will receive 
+one response from the server (at any time)
+
+Streaming Client are well suited for 
+
+  When the client needs to send a lot of data (big data)
+
+  When the Server processing is expensive and should happen
+  as the client sends data 
+
+  When the client needs to "PUSH" data to the server 
+  without really expecting a response 
+
+
+
+What's a Bi Directional Streaming API?
+
+The client will send many message to the server 
+and will receive many responses from the server 
+
+The number of requests and responses does not 
+have to match
+
+Bi Directional Streaming RPC are well suited for
+ 
+   When the client and the server needs to send a 
+   lot of data asynchronously
+
+   "Chat" protocol
+
+   Long running connections
+
+   

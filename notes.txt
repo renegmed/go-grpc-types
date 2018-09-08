@@ -35,4 +35,15 @@ Bi Directional Streaming RPC are well suited for
 
    Long running connections
 
-   
+
+Error Codes
+
+  With gRPC, there are few error codes: https://grpc.io/docs/guides/error.html
+
+  There is also a complete reference to implementation of error codes
+  that close a lot of gaps with the documentation: http://avi.im/grpc-errors
+
+  If an application needs to return extra information on top of an error
+  code, it can use the medata context.
+
+  

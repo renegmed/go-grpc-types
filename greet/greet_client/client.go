@@ -4,11 +4,16 @@ import (
 	"context"
 	"fmt"
 	"grpc-smaarek/greet/greetpb"
+	"math/rand"
+
+	"google.golang.org/grpc/codes"
+
 	"io"
 	"log"
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/status"
 )
 
 func main() {
@@ -29,8 +34,13 @@ func main() {
 
 	// doClientStreaming(client)
 
-	doBiDiStreaming(client)
+	//doBiDiStreaming(client)
 
+	// doUnaryWithDeadline(client, 5*time.Second) // should complete
+
+	// doUnaryWithDeadline(client, 1*time.Second) // should timeout
+
+	doMultiRequestsWithDeadline(client)
 }
 
 func doUnary(c greetpb.GreetServiceClient) {
@@ -231,4 +241,87 @@ func doBiDiStreaming(c greetpb.GreetServiceClient) {
 
 	// block until everything is done
 	<-waitc
+}
+
+func doUnaryWithDeadline(c greetpb.GreetServiceClient, timeout time.Duration) {
+	fmt.Println("Starting to do a UnaryWithDeadline RPC....")
+
+	req := &greetpb.GreetWithDeadlineRequest{
+		Greeting: &greetpb.Greeting{
+			FirstName: "John",
+			LastName:  "Partick",
+		},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	res, err := c.GreetWithDeadline(ctx, req)
+	if err != nil {
+
+		statusErr, ok := status.FromError(err)
+		if ok {
+			if statusErr.Code() == codes.DeadlineExceeded {
+				fmt.Println("Timeout was hit! Deadline was exceeded")
+			} else {
+				fmt.Printf("unexpected error: %v\n", statusErr)
+			}
+		} else {
+			log.Fatalf("Error while calling GreetWithDeadline RPC: %v", err)
+		}
+
+		return
+	}
+	log.Printf("Response from GreetWithDeadline: %v", res.Result)
+}
+
+func doMultiRequestsWithDeadline(c greetpb.GreetServiceClient) {
+	fmt.Println("Starting to do a MultiRequestsWithDeadline RPC....")
+
+	req := &greetpb.GreetWithDeadlineRequest{
+		Greeting: &greetpb.Greeting{
+			FirstName: "John",
+			LastName:  "Partick",
+		},
+	}
+
+	waitc := make(chan struct{})
+
+	// send messages from goroutine 1
+	go func() {
+		rand.Seed(time.Now().UTC().UnixNano())
+		for i := 0; i <= 5; i++ {
+			second := 1 + rand.Intn(8)
+			log.Printf("second: %d\n", second)
+			d := time.Duration(second) * time.Second
+
+			ctx, cancel := context.WithTimeout(context.Background(), d)
+			defer cancel()
+
+			res, err := c.GreetWithDeadline(ctx, req)
+			if err != nil {
+
+				statusErr, ok := status.FromError(err)
+				if ok {
+					if statusErr.Code() == codes.DeadlineExceeded {
+						fmt.Println("Timeout was hit! Deadline was exceeded")
+					} else {
+						fmt.Printf("unexpected error: %v\n", statusErr)
+					}
+				} else {
+					log.Fatalf("Error while calling GreetWithDeadline RPC: %v", err)
+				}
+
+			} else {
+				log.Printf("Response from GreetWithDeadline: %v", res.Result)
+			}
+		}
+		close(waitc)
+	}()
+
+	// send messages from goroutine 2
+
+	<-waitc
+	log.Println("Done!")
+
 }
